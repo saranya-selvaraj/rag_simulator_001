@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saranya Selvaraj — Senior TPO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0a0a12;
+    --paper: #f5f3ee;
+    --teal: #0e9f8a;
+    --teal-dim: #0e9f8a22;
+    --gold: #c9a84c;
+    --gold-dim: #c9a84c18;
+    --blue: #1a4a8a;
+    --blue-dim: #1a4a8a15;
+    --muted: #6b6b78;
+    --line: #0a0a1218;
+    --card: #ffffff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Mono', monospace;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .corner {
+    position: fixed;
+    width: 80px; height: 80px;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .corner::before, .corner::after { content: ''; position: absolute; background: var(--teal); }
+  .corner--tl { top: 24px; left: 24px; }
+  .corner--tl::before { top: 0; left: 0; width: 100%; height: 2px; }
+  .corner--tl::after  { top: 0; left: 0; width: 2px; height: 100%; }
+  .corner--tr { top: 24px; right: 24px; }
+  .corner--tr::before { top: 0; right: 0; width: 100%; height: 2px; }
+  .corner--tr::after  { top: 0; right: 0; width: 2px; height: 100%; }
+  .corner--bl { bottom: 24px; left: 24px; }
+  .corner--bl::before { bottom: 0; left: 0; width: 100%; height: 2px; }
+  .corner--bl::after  { bottom: 0; left: 0; width: 2px; height: 100%; }
+  .corner--br { bottom: 24px; right: 24px; }
+  .corner--br::before { bottom: 0; right: 0; width: 100%; height: 2px; }
+  .corner--br::after  { bottom: 0; right: 0; width: 2px; height: 100%; }
+
+  .ticker {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--ink);
+    color: var(--teal);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 6px 0;
+    overflow: hidden;
+    z-index: 100;
+    white-space: nowrap;
+  }
+  .ticker-inner {
+    display: inline-block;
+    animation: ticker 28s linear infinite;
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  .wrapper {
+    position: relative;
+    z-index: 2;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 64px 32px 80px;
+  }
+
+  .hero {
+    border: 2px solid var(--ink);
+    background: var(--card);
+    padding: 52px 52px 40px;
+    position: relative;
+    margin-bottom: 4px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.7s ease forwards 0.1s;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, var(--teal-dim) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-eyebrow::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--teal);
+    opacity: 0.4;
+    max-width: 200px;
+  }
+
+  .hero-name {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(48px, 8vw, 80px);
+    font-weight: 800;
+    line-height: 0.9;
+    letter-spacing: -3px;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .hero-name span { color: var(--teal); }
+
+  .hero-title {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 22px;
+    color: var(--muted);
+    margin-bottom: 32px;
+  }
+
+  .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border: 1px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    cursor: default;
+    transition: background 0.2s, color 0.2s;
+  }
+  .tag:hover { background: var(--ink); color: var(--paper); }
+  .tag.teal { border-color: var(--teal); color: var(--teal); }
+  .tag.teal:hover { background: var(--teal); color: #fff; }
+
+  .hero-coords {
+    position: absolute;
+    bottom: 18px; right: 24px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    opacity: 0.5;
+  }
+
+  .divider { height: 4px; background: var(--ink); margin-bottom: 4px; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .panel {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    padding: 36px 32px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .panel.delay-1 { animation: fadeUp 0.7s ease forwards 0.25s; }
+  .panel.delay-2 { animation: fadeUp 0.7s ease forwards 0.35s; }
+  .panel.delay-3 { animation: fadeUp 0.7s ease forwards 0.45s; }
+  .panel.delay-4 { animation: fadeUp 0.7s ease forwards 0.55s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .section-label {
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-label::before { content: '◆'; font-size: 7px; }
+
+  .skill-item { margin-bottom: 16px; }
+  .skill-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+  }
+  .skill-name-text { font-size: 11px; letter-spacing: 0.5px; color: var(--ink); }
+  .skill-pct { font-size: 9px; color: var(--teal); letter-spacing: 1px; }
+  .skill-track { height: 3px; background: var(--line); position: relative; overflow: hidden; }
+  .skill-fill {
+    height: 100%;
+    background: var(--ink);
+    width: 0;
+    transition: width 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+  }
+  .skill-fill::after {
+    content: '';
+    position: absolute;
+    right: 0; top: -2px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--teal);
+  }
+
+  .domain-chip {
+    display: inline-block;
+    padding: 4px 10px;
+    margin: 3px;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--muted);
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .domain-chip:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+
+  .tool-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .tool-item {
+    padding: 8px 10px;
+    background: var(--paper);
+    border-left: 2px solid var(--ink);
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s;
+    cursor: default;
+  }
+  .tool-item:hover { border-color: var(--teal); color: var(--ink); }
+
+  .timeline { position: relative; }
+  .tl-item {
+    padding-left: 24px;
+    border-left: 2px solid var(--line);
+    margin-bottom: 32px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .tl-item::before {
+    content: '';
+    position: absolute;
+    left: -5px; top: 4px;
+    width: 8px; height: 8px;
+    background: var(--ink);
+    border-radius: 50%;
+    transition: background 0.2s;
+  }
+  .tl-item:hover::before { background: var(--teal); }
+  .tl-item:last-child { margin-bottom: 0; }
+
+  .tl-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .tl-period { font-size: 9px; letter-spacing: 2px; color: var(--teal); text-transform: uppercase; }
+  .tl-sep { width: 20px; height: 1px; background: var(--line); }
+  .tl-co {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+  .tl-role {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .tl-points { list-style: none; }
+  .tl-points li {
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    padding-left: 12px;
+    position: relative;
+    margin-bottom: 4px;
+  }
+  .tl-points li::before { content: '—'; position: absolute; left: 0; color: var(--teal); }
+
+  .full-panel {
+    background: var(--card);
+    border: 2px solid var(--ink);
+    padding: 36px 48px;
+    margin-bottom: 4px;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  .full-panel.delay-5 { animation: fadeUp 0.7s ease forwards 0.6s; }
+  .full-panel.delay-6 { animation: fadeUp 0.7s ease forwards 0.7s; }
+
+  .domain-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .domain-card {
+    padding: 24px 20px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+  .domain-card:hover { border-color: var(--teal); transform: translateY(-3px); background: #fff; }
+  .domain-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+  .domain-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .domain-desc { font-size: 10px; color: var(--muted); line-height: 1.7; }
+
+  .profile-text {
+    font-family: 'Instrument Serif', serif;
+    font-size: 20px;
+    line-height: 1.7;
+    color: var(--ink);
+    max-width: 780px;
+  }
+  .profile-text em { color: var(--teal); font-style: italic; }
+
+  .cred-strip { display: flex; gap: 0; }
+  .cred-item {
+    flex: 1;
+    border: 2px solid var(--ink);
+    border-right: none;
+    padding: 24px 20px;
+    text-align: center;
+    background: var(--paper);
+    transition: background 0.2s;
+    cursor: default;
+  }
+  .cred-item:last-child { border-right: 2px solid var(--ink); }
+  .cred-item:hover { background: var(--ink); }
+  .cred-item:hover .cred-val,
+  .cred-item:hover .cred-label { color: var(--paper); }
+  .cred-item:hover .cred-val em { color: var(--teal); }
+  .cred-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+    transition: color 0.2s;
+  }
+  .cred-val em { color: var(--teal); font-style: normal; }
+  .cred-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+
+  .footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 24px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid var(--ink);
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.7s ease forwards 0.8s;
+  }
+  .footer-left { font-size: 11px; letter-spacing: 1px; color: rgba(255,255,255,0.5); }
+  .footer-right {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    cursor: pointer;
+  }
+  .footer-right:hover { text-decoration: underline; }
+
+  .print-btn {
+    position: fixed;
+    bottom: 32px; right: 32px;
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    z-index: 200;
+    transition: background 0.2s, transform 0.15s;
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .print-btn:hover { background: var(--ink); transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--teal); }
+  .print-btn:active { transform: translate(0,0); box-shadow: 2px 2px 0 var(--ink); }
+
+  @media print {
+    .ticker, .print-btn, .corner, .grid-bg { display: none !important; }
+    body { background: #fff; }
+    .wrapper { padding: 20px; }
+    .hero, .panel, .full-panel { opacity: 1 !important; transform: none !important; animation: none !important; }
+  }
+
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+    .domain-grid { grid-template-columns: 1fr 1fr; }
+    .cred-strip { flex-direction: column; }
+    .cred-item { border-right: 2px solid var(--ink); border-bottom: none; }
+    .cred-item:last-child { border-bottom: 2px solid var(--ink); }
+    .hero { padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="corner corner--tl"></div>
+<div class="corner corner--tr"></div>
+<div class="corner corner--bl"></div>
+<div class="corner corner--br"></div>
+
+<div class="ticker">
+  <span class="ticker-inner">
+    ◆ SARANYA SELVARAJ · SENIOR TECHNICAL PRODUCT OWNER · DUBLIN, IRELAND · SAFE POPM CERTIFIED · PCI-DSS · GDPR · CBI REGULATED · PAYMENTS · INSURTECH · FINTECH · AI IN COMPLIANCE · 12+ YEARS FINANCIAL SERVICES &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    ◆ SARANYA SELVARAJ · SENIOR TECHNICAL PRODUCT OWNER · DUBLIN, IRELAND · SAFE POPM CERTIFIED · PCI-DSS · GDPR · CBI REGULATED · PAYMENTS · INSURTECH · FINTECH · AI IN COMPLIANCE · 12+ YEARS FINANCIAL SERVICES &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span>
+</div>
+
+<div class="wrapper">
+
+  <div class="hero">
+    <div class="hero-eyebrow">Curriculum Vitae · 2025</div>
+    <div class="hero-name">Saranya<br><span>Selvaraj</span></div>
+    <div class="hero-title">Senior Technical Product Owner — Regulated Fintech & InsurTech</div>
+    <div class="hero-meta">
+      <span class="tag teal">Dublin, IE · Hybrid</span>
+      <span class="tag teal">SAFe POPM Certified</span>
+      <span class="tag">Payments</span>
+      <span class="tag">Insurance</span>
+      <span class="tag">AI Governance</span>
+      <span class="tag">PCI-DSS</span>
+      <span class="tag">GDPR</span>
+    </div>
+    <div class="hero-coords">53.3498° N · 6.2603° W</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="cred-strip">
+    <div class="cred-item">
+      <span class="cred-val">12<em>+</em></span>
+      <span class="cred-label">Years in Financial Services</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-val"><em>4</em></span>
+      <span class="cred-label">Industry Sectors</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-val">SAFe</span>
+      <span class="cred-label">POPM Certified</span>
+    </div>
+    <div class="cred-item">
+      <span class="cred-val"><em>∞</em></span>
+      <span class="cred-label">Regulatory Frameworks</span>
+    </div>
+  </div>
+
+  <div style="height:4px"></div>
+
+  <div class="full-panel delay-5">
+    <div class="section-label">Profile</div>
+    <p class="profile-text">
+      A methodical, <em>regulation-fluent</em> Product Owner who began in QA and never lost the instinct for edge cases, boundary conditions, and unhappy paths. Specialist in translating complex <em>PCI-DSS, GDPR, and CBI</em> requirements into precise, testable Given/When/Then acceptance criteria. Currently embedding <em>AI into compliance workflows</em> at FBD Insurance; seeking a TPO role in regulated fintech or RegTech where product ownership means something long-term.
+    </p>
+  </div>
+
+  <div style="height:4px"></div>
+
+  <div class="two-col">
+    <div>
+      <div class="panel delay-1" style="margin-bottom:4px">
+        <div class="section-label">Core Competencies</div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">Regulatory AC / BDD</span><span class="skill-pct">98%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="98"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">API & Integration PO</span><span class="skill-pct">95%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="95"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">Privacy & Data Governance</span><span class="skill-pct">92%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="92"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">AI Product Thinking</span><span class="skill-pct">88%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="88"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">Fraud Rules & Controls</span><span class="skill-pct">90%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="90"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">QA / Test Engineering</span><span class="skill-pct">96%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="96"></div></div>
+        </div>
+        <div class="skill-item">
+          <div class="skill-head"><span class="skill-name-text">SQL & Data Analysis</span><span class="skill-pct">75%</span></div>
+          <div class="skill-track"><div class="skill-fill" data-pct="75"></div></div>
+        </div>
+      </div>
+
+      <div class="panel delay-2" style="margin-bottom:4px">
+        <div class="section-label">Tools & Technologies</div>
+        <div class="tool-grid">
+          <div class="tool-item">Jira</div>
+          <div class="tool-item">Postman</div>
+          <div class="tool-item">Salesforce</div>
+          <div class="tool-item">SQL</div>
+          <div class="tool-item">Power BI</div>
+          <div class="tool-item">Power Automate</div>
+          <div class="tool-item">FitNesse</div>
+          <div class="tool-item">ICEDQ</div>
+          <div class="tool-item">ALM Rally</div>
+          <div class="tool-item">M365 Copilot</div>
+        </div>
+      </div>
+
+      <div class="panel delay-2">
+        <div class="section-label">Specialisations</div>
+        <div>
+          <span class="domain-chip">PCI-DSS</span>
+          <span class="domain-chip">GDPR PIA/LIA</span>
+          <span class="domain-chip">CBI Compliance</span>
+          <span class="domain-chip">Digital Identity</span>
+          <span class="domain-chip">REST APIs</span>
+          <span class="domain-chip">SAFe Agile</span>
+          <span class="domain-chip">AI Governance</span>
+          <span class="domain-chip">Audit Trail AC</span>
+          <span class="domain-chip">Human Oversight</span>
+          <span class="domain-chip">Data Masking</span>
+          <span class="domain-chip">DPO Sign-off</span>
+          <span class="domain-chip">Sanctions Screening</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel delay-3">
+      <div class="section-label">Career Timeline</div>
+      <div class="timeline">
+
+        <div class="tl-item">
+          <div class="tl-meta">
+            <span class="tl-period">2023 — Present</span>
+            <span class="tl-sep"></span>
+            <span class="tl-co">FBD Insurance</span>
+          </div>
+          <div class="tl-role">IT Business Analyst / de facto Product Owner</div>
+          <ul class="tl-points">
+            <li>Led paperless SOF transformation for CBI-regulated insurance products</li>
+            <li>Authored GDPR PIA/LIA with DPO sign-off; designed field-level data masking strategy</li>
+            <li>Introduced Power Automate and Microsoft Copilot AI into operational workflows</li>
+            <li>Owned backlog end-to-end across MTA, renewals, and CPC-regulated product lines</li>
+          </ul>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-meta">
+            <span class="tl-period">2021 — 2023</span>
+            <span class="tl-sep"></span>
+            <span class="tl-co">Mastercard</span>
+          </div>
+          <div class="tl-role">Senior Technical Product Owner</div>
+          <ul class="tl-points">
+            <li>Owned Consumer Controls — fraud rules, transaction alerts, card security product</li>
+            <li>Delivered Digital Identity and PCI-DSS programmes in a SAFe scaled environment</li>
+            <li>Authored precision Given/When/Then ACs with GDPR compliance embedded</li>
+            <li>Managed cross-functional squads spanning Dublin and international geographies</li>
+          </ul>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-meta">
+            <span class="tl-period">2015 — 2021</span>
+            <span class="tl-sep"></span>
+            <span class="tl-co">Fidelity Investments</span>
+          </div>
+          <div class="tl-role">Senior Systems Analyst / Senior QA Engineer</div>
+          <ul class="tl-points">
+            <li>Led Salesforce POC for vendor onboarding; owned commissions management design</li>
+            <li>Built REST API automation frameworks with Postman and FitNesse</li>
+            <li>Progressed QA → Systems Analyst; bridging engineering and business stakeholders</li>
+          </ul>
+        </div>
+
+        <div class="tl-item">
+          <div class="tl-meta">
+            <span class="tl-period">2010 — 2014</span>
+            <span class="tl-sep"></span>
+            <span class="tl-co">TCS</span>
+          </div>
+          <div class="tl-role">Test Analyst</div>
+          <ul class="tl-points">
+            <li>Test analyst for Lloyds Banking Group and Citibank USA</li>
+            <li>Data migration, fraud detection, and core banking systems testing</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="height:4px"></div>
+
+  <div class="full-panel delay-6">
+    <div class="section-label">Domain Expertise</div>
+    <div class="domain-grid">
+      <div class="domain-card">
+        <span class="domain-icon">⬡</span>
+        <div class="domain-title">Payments & Fraud</div>
+        <div class="domain-desc">Mastercard fraud rules, PCI-DSS, consumer controls, transaction alerts, card security, digital identity</div>
+      </div>
+      <div class="domain-card">
+        <span class="domain-icon">◈</span>
+        <div class="domain-title">Insurance & Regulatory</div>
+        <div class="domain-desc">CBI, CPC, SOF, MTA, renewals, GDPR PIA/LIA, bancassurance, claims, FBD insurance product lines</div>
+      </div>
+      <div class="domain-card">
+        <span class="domain-icon">◎</span>
+        <div class="domain-title">AI in Compliance</div>
+        <div class="domain-desc">Threshold ownership, audit trail as first-class AC, human oversight explicit in stories, AI governance</div>
+      </div>
+      <div class="domain-card">
+        <span class="domain-icon">◫</span>
+        <div class="domain-title">Data & Governance</div>
+        <div class="domain-desc">SQL, Power BI, SFTP, data masking, warehouse validation, sanctions screening, vendor due diligence</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:4px"></div>
+
+  <div class="footer">
+    <div class="footer-left">Dublin, Ireland · Available for hybrid TPO roles in regulated fintech or RegTech · References on request</div>
+    <div class="footer-right" onclick="window.print()">⬡ Print / Export PDF</div>
+  </div>
+
+</div>
+
+<button class="print-btn" onclick="window.print()">⬡ Save as PDF</button>
+
+<script>
+  const fills = document.querySelectorAll('.skill-fill');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        setTimeout(() => { el.style.width = el.dataset.pct + '%'; }, 200);
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.3 });
+  fills.forEach(f => observer.observe(f));
+
+  document.querySelectorAll('.tl-item').forEach(item => {
+    item.addEventListener('mouseenter', () => { item.style.borderLeftColor = 'var(--teal)'; });
+    item.addEventListener('mouseleave', () => { item.style.borderLeftColor = ''; });
+  });
+</script>
+</body>
+</html>
