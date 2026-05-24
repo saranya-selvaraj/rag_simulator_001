@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RAG Simulator</title>
+
+<style>
+    *{
+        margin:0;
+        padding:0;
+        box-sizing:border-box;
+        font-family: Inter, system-ui, sans-serif;
+    }
+
+    body{
+        background:#0f172a;
+        color:white;
+        min-height:100vh;
+        overflow-x:hidden;
+    }
+
+    .container{
+        width:95%;
+        max-width:1400px;
+        margin:auto;
+        padding:40px 0;
+    }
+
+    h1{
+        font-size:3rem;
+        margin-bottom:10px;
+        background:linear-gradient(90deg,#38bdf8,#8b5cf6);
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+    }
+
+    .subtitle{
+        color:#94a3b8;
+        margin-bottom:40px;
+        line-height:1.6;
+    }
+
+    .layout{
+        display:grid;
+        grid-template-columns: 1fr 1fr;
+        gap:24px;
+    }
+
+    .card{
+        background:rgba(255,255,255,0.05);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:24px;
+        padding:24px;
+        backdrop-filter:blur(12px);
+        box-shadow:0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    h2{
+        margin-bottom:18px;
+        font-size:1.3rem;
+    }
+
+    textarea{
+        width:100%;
+        min-height:180px;
+        background:#0f172a;
+        border:1px solid #334155;
+        border-radius:14px;
+        color:white;
+        padding:16px;
+        resize:vertical;
+        line-height:1.6;
+        font-size:15px;
+    }
+
+    input{
+        width:100%;
+        padding:14px;
+        border-radius:12px;
+        border:1px solid #334155;
+        background:#0f172a;
+        color:white;
+        margin-top:12px;
+        font-size:15px;
+    }
+
+    button{
+        margin-top:16px;
+        padding:14px 18px;
+        border:none;
+        border-radius:14px;
+        background:linear-gradient(90deg,#06b6d4,#8b5cf6);
+        color:white;
+        cursor:pointer;
+        font-weight:600;
+        transition:0.3s;
+    }
+
+    button:hover{
+        transform:translateY(-2px);
+        opacity:0.9;
+    }
+
+    .steps{
+        margin-top:40px;
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        gap:16px;
+    }
+
+    .step{
+        background:rgba(255,255,255,0.04);
+        border:1px solid rgba(255,255,255,0.06);
+        border-radius:18px;
+        padding:18px;
+        min-height:160px;
+        transition:0.3s;
+    }
+
+    .step.active{
+        border-color:#38bdf8;
+        transform:scale(1.02);
+        box-shadow:0 0 20px rgba(56,189,248,0.2);
+    }
+
+    .step-number{
+        width:40px;
+        height:40px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius:50%;
+        background:linear-gradient(90deg,#38bdf8,#8b5cf6);
+        margin-bottom:12px;
+        font-weight:bold;
+    }
+
+    .chunk{
+        background:#1e293b;
+        padding:12px;
+        border-radius:12px;
+        margin-bottom:10px;
+        border-left:4px solid transparent;
+        transition:0.3s;
+    }
+
+    .chunk.highlight{
+        border-left:4px solid #38bdf8;
+        background:#172554;
+    }
+
+    .vector{
+        font-size:12px;
+        color:#93c5fd;
+        margin-top:8px;
+        word-break:break-word;
+    }
+
+    .score{
+        color:#4ade80;
+        font-weight:bold;
+        margin-top:8px;
+    }
+
+    .answer-box{
+        margin-top:20px;
+        padding:18px;
+        border-radius:16px;
+        background:#082f49;
+        border:1px solid #0ea5e9;
+        line-height:1.7;
+    }
+
+    .flow{
+        margin-top:30px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        flex-wrap:wrap;
+    }
+
+    .flow-box{
+        flex:1;
+        min-width:200px;
+        background:#111827;
+        padding:16px;
+        border-radius:16px;
+        text-align:center;
+        border:1px solid #374151;
+    }
+
+    .arrow{
+        font-size:2rem;
+        color:#38bdf8;
+    }
+
+    .small{
+        color:#94a3b8;
+        font-size:14px;
+        margin-top:8px;
+    }
+
+    @media(max-width:1000px){
+        .layout{
+            grid-template-columns:1fr;
+        }
+
+        .steps{
+            grid-template-columns:1fr;
+        }
+
+        .flow{
+            flex-direction:column;
+        }
+
+        .arrow{
+            transform:rotate(90deg);
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>RAG Simulator</h1>
+
+    <p class="subtitle">
+        Interactive simulation of Retrieval-Augmented Generation (RAG). 
+        This demonstrates how documents are chunked, embedded into vectors,
+        retrieved with cosine similarity, and finally used by an LLM to answer questions.
+    </p>
+
+    <div class="layout">
+
+        <div class="card">
+            <h2>📚 Knowledge Base Documents</h2>
+
+            <textarea id="docs">
+Food poisoning often causes nausea, vomiting, diarrhea, and stomach cramps. Most cases improve with rest and hydration.
+
+Drink water and electrolyte solutions to prevent dehydration. Avoid dairy and greasy foods during recovery.
+
+You should call a doctor if symptoms last longer than three days or if there is blood in vomit or stool.
+
+Fever and severe abdominal pain may indicate a more serious infection requiring medical attention.
+
+Wash hands before eating and cook meat thoroughly to reduce the risk of foodborne illness.
+            </textarea>
+
+            <button onclick="buildKnowledgeBase()">
+                Step 1 — Build Knowledge Base
+            </button>
+
+            <div id="chunksContainer" style="margin-top:20px;"></div>
+        </div>
+
+        <div class="card">
+            <h2>❓ Ask a Question</h2>
+
+            <input 
+                id="questionInput"
+                value="What should I do if I think I have food poisoning?"
+            />
+
+            <button onclick="runRAG()">
+                Run RAG Pipeline
+            </button>
+
+            <div id="queryVector" style="margin-top:20px;"></div>
+
+            <div id="retrievalResults" style="margin-top:20px;"></div>
+
+            <div id="finalAnswer"></div>
+        </div>
+
+    </div>
+
+    <div class="steps">
+
+        <div class="step" id="step1">
+            <div class="step-number">1</div>
+            <h3>Indexing</h3>
+            <p class="small">
+                Split documents into chunks and convert each chunk into embeddings (vectors).
+            </p>
+        </div>
+
+        <div class="step" id="step2">
+            <div class="step-number">2</div>
+            <h3>Query Embedding</h3>
+            <p class="small">
+                Convert the user's question into a vector using the same embedding process.
+            </p>
+        </div>
+
+        <div class="step" id="step3">
+            <div class="step-number">3</div>
+            <h3>Retrieval</h3>
+            <p class="small">
+                Compare vectors using cosine similarity and retrieve top matching chunks.
+            </p>
+        </div>
+
+        <div class="step" id="step4">
+            <div class="step-number">4</div>
+            <h3>Generation</h3>
+            <p class="small">
+                The LLM receives the retrieved chunks as context and generates an answer.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="flow">
+
+        <div class="flow-box">
+            Documents
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="flow-box">
+            Chunking + Embeddings
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="flow-box">
+            Vector Database
+        </div>
+
+        <div class="arrow">→</div>
+
+        <div class="flow-box">
+            Retrieval + LLM
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let chunks = [];
+let vectors = [];
+
+function activateStep(stepId){
+    document.querySelectorAll('.step').forEach(s => {
+        s.classList.remove('active');
+    });
+
+    document.getElementById(stepId).classList.add('active');
+}
+
+function fakeEmbedding(text){
+    // Fake embedding generator
+    const words = text.toLowerCase().split(/\W+/);
+
+    let vector = [0,0,0,0,0];
+
+    words.forEach(word => {
+        vector[0] += word.length;
+        vector[1] += word.charCodeAt(0) || 0;
+        vector[2] += word.includes('doctor') ? 5 : 1;
+        vector[3] += word.includes('food') ? 5 : 1;
+        vector[4] += word.includes('pain') ? 5 : 1;
+    });
+
+    return vector.map(v => Number((v / words.length).toFixed(2)));
+}
+
+function cosineSimilarity(a,b){
+    let dot = 0;
+    let magA = 0;
+    let magB = 0;
+
+    for(let i=0;i<a.length;i++){
+        dot += a[i] * b[i];
+        magA += a[i] * a[i];
+        magB += b[i] * b[i];
+    }
+
+    magA = Math.sqrt(magA);
+    magB = Math.sqrt(magB);
+
+    return dot / (magA * magB);
+}
+
+function buildKnowledgeBase(){
+
+    activateStep('step1');
+
+    const text = document.getElementById('docs').value;
+
+    chunks = text
+        .split('\n')
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+
+    vectors = chunks.map(chunk => fakeEmbedding(chunk));
+
+    const container = document.getElementById('chunksContainer');
+
+    container.innerHTML = `
+        <h3 style="margin-bottom:15px;">Generated Chunks + Embeddings</h3>
+    `;
+
+    chunks.forEach((chunk,index) => {
+
+        container.innerHTML += `
+            <div class="chunk">
+                <strong>Chunk ${index+1}</strong>
+                <div style="margin-top:8px;">${chunk}</div>
+
+                <div class="vector">
+                    Embedding Vector:
+                    [${vectors[index].join(', ')}]
+                </div>
+            </div>
+        `;
+    });
+}
+
+function runRAG(){
+
+    if(chunks.length === 0){
+        buildKnowledgeBase();
+    }
+
+    activateStep('step2');
+
+    const question = document.getElementById('questionInput').value;
+
+    const queryVector = fakeEmbedding(question);
+
+    document.getElementById('queryVector').innerHTML = `
+        <h3>Query Embedding</h3>
+
+        <div class="chunk highlight">
+            "${question}"
+
+            <div class="vector">
+                Query Vector:
+                [${queryVector.join(', ')}]
+            </div>
+        </div>
+    `;
+
+    setTimeout(() => {
+
+        activateStep('step3');
+
+        let scored = chunks.map((chunk,index) => {
+
+            return {
+                chunk,
+                vector:vectors[index],
+                similarity: cosineSimilarity(queryVector, vectors[index])
+            };
+
+        });
+
+        scored.sort((a,b) => b.similarity - a.similarity);
+
+        const topK = scored.slice(0,2);
+
+        let retrievalHTML = `
+            <h3>Top Retrieved Chunks (Top-K)</h3>
+        `;
+
+        topK.forEach((item,index) => {
+
+            retrievalHTML += `
+                <div class="chunk highlight">
+
+                    <strong>Retrieved Chunk ${index+1}</strong>
+
+                    <div style="margin-top:8px;">
+                        ${item.chunk}
+                    </div>
+
+                    <div class="score">
+                        Cosine Similarity:
+                        ${item.similarity.toFixed(3)}
+                    </div>
+
+                </div>
+            `;
+        });
+
+        document.getElementById('retrievalResults').innerHTML = retrievalHTML;
+
+        setTimeout(() => {
+
+            activateStep('step4');
+
+            const context = topK.map(t => t.chunk).join(" ");
+
+            const finalAnswer = `
+                Based on the retrieved context, if you think you have food poisoning,
+                you should stay hydrated, rest, and avoid greasy foods.
+                If symptoms last longer than three days, or if you experience
+                blood in vomit/stool, severe abdominal pain, or fever,
+                you should contact a doctor.
+            `;
+
+            document.getElementById('finalAnswer').innerHTML = `
+                <div class="answer-box">
+
+                    <h3 style="margin-bottom:12px;">
+                        🤖 Final LLM Answer
+                    </h3>
+
+                    <p>
+                        ${finalAnswer}
+                    </p>
+
+                    <hr style="margin:18px 0;border-color:#1e3a8a;">
+
+                    <strong>Context Given To LLM:</strong>
+
+                    <p style="margin-top:10px;color:#cbd5e1;">
+                        ${context}
+                    </p>
+
+                </div>
+            `;
+
+        },1000);
+
+    },1000);
+
+}
+
+buildKnowledgeBase();
+
+</script>
+
+</body>
+</html>
